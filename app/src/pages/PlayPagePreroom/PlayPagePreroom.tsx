@@ -2,12 +2,11 @@ import { useAppDispatch, useAppSelector } from "@/store";
 import {
   getConnectedPlayers,
   getGameStarted,
-  getHostName,
+  getIsHost,
   getIsJoining,
-  getIsModerator,
   getRoomID,
+  getUser,
 } from "@/store/selectors/gameSelectors.ts";
-import { getUserName } from "@/store/selectors/authSelectors.ts";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Dispatch,
@@ -15,13 +14,14 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useState,
 } from "react";
 import {
   setConnected,
   setConnectedPlayers,
-  setHostName,
   setRoomID,
   setStartGame,
+  setUser,
 } from "@/store/reducers/game.ts";
 import {
   getChosenGeneralTopic,
@@ -36,7 +36,21 @@ import { CreateRoomFunctions } from "@/serverEvents/functions/createRoom.ts";
 import { JoinRoomFunctions } from "@/serverEvents/functions/joinRoom.ts";
 import { useRegisterPagePreroomEvents } from "../../serverEvents/playPagePreroomEvents.tsx";
 import { PlayerNameOverlay } from "@/components/ui/PlayerNameOverlay/PlayerNameOverlay.tsx";
-import { Dialog, DialogContent } from "@/components/ui/dialog.tsx";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+} from "@/components/ui/alert-dialog.tsx";
+import { socket } from "@/index.tsx";
+import { Check, Copy } from "lucide-react";
+import { Popover, PopoverContent } from "@/components/ui/popover.tsx";
+import { PopoverTrigger } from "@radix-ui/react-popover";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip.tsx";
 
 const HostContent = () => {
   const connectedPlayers = useAppSelector(getConnectedPlayers);
@@ -44,24 +58,69 @@ const HostContent = () => {
   const dispatch = useAppDispatch();
   const players = useAppSelector(getConnectedPlayers);
   const numberOfPlayers = useMemo(() => players.length, [players]);
+  const [popoverOpen, setPopoverOpen] = useState(false);
+  const playersConnected = useMemo(
+    () => connectedPlayers.length > 0,
+    [connectedPlayers],
+  );
 
   const handleStartGame = useCallback(() => {
     StartGameFunctions.in(roomId);
     dispatch(setStartGame(true));
   }, [dispatch, roomId]);
 
+  const handleLinkCopy = useCallback(() => {
+    setPopoverOpen(true);
+    setTimeout(() => setPopoverOpen(false), 1000);
+    navigator.clipboard.writeText(document.location.href);
+  }, []);
+
   return (
     <>
       <div>
-        Beigetretene Spieler:
-        {connectedPlayers.map((player) => (
-          <>{player.userName}</>
-        ))}
+        <div className="mb-3">
+          <div>Teile diese Internetadresse, um spieler einzuladen</div>
+          <div className="flex justify-between accent-muted align-middle border-2 rounded mt-1 p-2 pb-0.5">
+            {document.location.href}
+            <Popover open={popoverOpen}>
+              <PopoverTrigger>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Copy className="cursor-pointer" onClick={handleLinkCopy} />
+                  </TooltipTrigger>
+                  <TooltipContent>Link kopieren</TooltipContent>
+                </Tooltip>
+              </PopoverTrigger>
+              <PopoverContent className="w-fit flex gap-x-1">
+                Link kopiert
+                <Check className="stroke-green-500" />
+              </PopoverContent>
+            </Popover>
+          </div>
+        </div>
+        {playersConnected ? (
+          <>
+            <div className="mb-5">Beigetretene Spieler:</div>
+            <div className="grid auto-rows-min gap-y-2 mb-10">
+              {connectedPlayers.map((player) => (
+                <div className="border-2 p-1 text-center">
+                  {player.userName}
+                </div>
+              ))}
+            </div>
+          </>
+        ) : (
+          <div className="animate-pulse">Warte auf Beitritt von Spielern</div>
+        )}
       </div>
-      {numberOfPlayers >= 0 && (
-        <button onClick={handleStartGame}>Spiel starten</button>
-      )}
-      <button>Raum schließen</button>
+      <div className="grid grid-cols-2 gap-x-5">
+        {numberOfPlayers >= 0 && (
+          <AlertDialogAction onClick={handleStartGame}>
+            Spiel starten
+          </AlertDialogAction>
+        )}
+        <AlertDialogCancel>Raum schließen</AlertDialogCancel>
+      </div>
     </>
   );
 };
@@ -75,16 +134,15 @@ interface PlayPagePreroomProps {
   setShown: Dispatch<SetStateAction<boolean>>;
 }
 export const PlayPagePreroom = ({ shown, setShown }: PlayPagePreroomProps) => {
-  const hostName = useAppSelector(getHostName);
   const chosenPackname = useAppSelector(getChosenPackName);
   const chosenTopic = useAppSelector(getChosenGeneralTopic);
-  const userName = useAppSelector(getUserName);
+  const userName = useAppSelector(getUser).userName;
   const roomId = useAppSelector(getRoomID);
   const isJoining = useAppSelector(getIsJoining);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { id } = useParams();
-  const isHost = useAppSelector(getIsModerator);
+  const isHost = useAppSelector(getIsHost);
   const gameStarted = useAppSelector(getGameStarted);
   useRegisterPagePreroomEvents();
 
@@ -95,7 +153,7 @@ export const PlayPagePreroom = ({ shown, setShown }: PlayPagePreroomProps) => {
       if (chosenPackname && chosenTopic && roomId) {
         CreateRoomFunctions.in(roomId, chosenTopic, chosenPackname, userName);
         CreateRoomFunctions.out(() => {
-          dispatch(setHostName(userName));
+          dispatch(setUser({ isHost: true, socketId: socket.id }));
           dispatch(setConnected(true));
         });
       } else {
@@ -106,7 +164,7 @@ export const PlayPagePreroom = ({ shown, setShown }: PlayPagePreroomProps) => {
       if (roomData.players) {
         dispatch(setConnectedPlayers(roomData.players));
         dispatch(setChosenPackName(roomData.packname));
-        dispatch(setHostName(roomData.hostName));
+        dispatch(setUser({ socketId: socket.id }));
         dispatch(setChosenGeneralTopic(roomData.generalTopic));
         dispatch(setConnected(true));
       }
@@ -127,14 +185,16 @@ export const PlayPagePreroom = ({ shown, setShown }: PlayPagePreroomProps) => {
   }, [gameStarted]);
 
   return (
-    <Dialog onOpenChange={setShown} open={shown}>
-      {hostName ? (
-        <DialogContent>
-          {isHost ? <HostContent /> : <PlayerContent />}
-        </DialogContent>
-      ) : (
-        <PlayerNameOverlay />
-      )}
-    </Dialog>
+    <AlertDialog onOpenChange={setShown} open={shown}>
+      <AlertDialogContent>
+        <>
+          {isHost !== undefined ? (
+            <>{isHost ? <HostContent /> : <PlayerContent />}</>
+          ) : (
+            <PlayerNameOverlay />
+          )}
+        </>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 };

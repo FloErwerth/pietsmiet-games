@@ -39,7 +39,7 @@ export const GeneralTopic = () => {
           onChange={(e) => setFilter(e.target.value)}
         />
       </div>
-      <ScrollArea className="h-[600px] w-full rounded-md p-4">
+      <ScrollArea className="h-[600px] w-full rounded-md pr-4">
         <div className="grid grid-cols-3 gap-5">
           {mappedTopics.map(([generalTopicName, infos]) => {
             const isFiltered = !Object.values(filtered).find((name) => {

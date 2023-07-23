@@ -22,10 +22,6 @@ export const useRegisterPageEvents = () => {
         dispatch(setConnectedPlayers(roomData.players));
       }
     });
-    socket.on("buzzer/out", ({ socketId, userName }) => {
-      console.log(socketId, " has buzzered");
-      dispatch(setActiveBuzzer({ socketId, userName }));
-    });
     socket.on("resetBuzzer/out", () => {
       dispatch(resetBuzzer());
     });

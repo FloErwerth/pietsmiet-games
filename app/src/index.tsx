@@ -7,6 +7,7 @@ import { store } from "./store";
 import { io, Socket } from "socket.io-client";
 import { IncommingMessages, OutgoingMessages } from "../../backend";
 import { App } from "@/App.tsx";
+import { TooltipProvider } from "@/components/ui/tooltip.tsx";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement,
@@ -21,7 +22,9 @@ root.render(
   <React.StrictMode>
     <Provider store={store}>
       <BrowserRouter>
-        <App />
+        <TooltipProvider>
+          <App />
+        </TooltipProvider>
       </BrowserRouter>
     </Provider>
   </React.StrictMode>,

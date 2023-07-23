@@ -1,12 +1,12 @@
 import { useCallback, useState } from "react";
 
 import { useAppDispatch } from "@/store";
-import { setUserName } from "@/store/reducers/auth.ts";
 import { useNavigate } from "react-router-dom";
 import {
   setConnected,
   setIsJoining,
   setRoomID,
+  setUser,
 } from "@/store/reducers/game.ts";
 import { useEffectOnce } from "react-use";
 import { Input } from "@/components/ui/input.tsx";
@@ -22,7 +22,6 @@ export const MainPage = () => {
     dispatch(setIsJoining(false));
     return () => {
       dispatch(setConnected(false));
-
       dispatch(setRoomID(""));
     };
   });
@@ -38,7 +37,7 @@ export const MainPage = () => {
 
   const handleConfirmName = useCallback(() => {
     if (name.length > 0) {
-      dispatch(setUserName(name));
+      dispatch(setUser({ userName: name }));
       navigate("/generalTopic");
     }
   }, [dispatch, name, navigate]);

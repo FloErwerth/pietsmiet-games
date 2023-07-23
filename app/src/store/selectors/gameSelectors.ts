@@ -1,6 +1,5 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { getState } from "./baseSelectors";
-import { getUserName } from "./authSelectors.ts";
 import { topics } from "@/data";
 import { getChosenGeneralTopic, getChosenPackName } from "./topicSelectors.ts";
 
@@ -31,18 +30,25 @@ export const getIsBuzzerLocked = createSelector(
   [getGameState],
   (state) => state.buzzerLocked,
 );
-export const getHostName = createSelector(
-  [getGameState],
-  (state) => state.hostName,
-);
 export const getGameStarted = createSelector(
   [getGameState],
   (state) => state.gameStarted,
 );
-export const getIsModerator = createSelector(
-  [getHostName, getUserName],
-  (hostname, username) => hostname === username,
+
+export const getUser = createSelector([getGameState], (state) => {
+  return state.user;
+});
+
+export const getIsHost = createSelector([getUser], (user) => user.isHost);
+export const getHostName = createSelector(
+  [getUser, getIsHost],
+  (user, isHost) => {
+    if (isHost) {
+      return user.userName;
+    }
+  },
 );
+
 export const getQuestionAnserIndex = createSelector(
   [getGameState],
   (state) => state.questionAnserIndex,

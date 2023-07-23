@@ -66,7 +66,7 @@ export const ChooseQuestionSet = () => {
         />
       </div>
       {infos && (
-        <ScrollArea className="h-[600px] w-full rounded-md p-4">
+        <ScrollArea className="h-[600px] w-full rounded-md pr-4">
           <div className="grid grid-cols-3 gap-5">
             {extractedInfos.map(({ packName, videoId }) => {
               const isFiltered = !filtered.includes(packName);

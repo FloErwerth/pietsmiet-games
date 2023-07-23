@@ -73,7 +73,7 @@
     @apply border-border;
   }
   body {
-    padding-inline: 300px;
+    padding-inline: 300px !important;
     margin-top: 40px;
     height: calc(100vh - 40px);
     @apply bg-background text-foreground;
