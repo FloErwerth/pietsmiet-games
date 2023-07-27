@@ -6,12 +6,22 @@ import {
   setBuzzerLocked,
   setConnectedPlayers,
   setQuestionAnswerIndex,
+  setText,
+  setTextRevealed,
 } from "../store/reducers/game.ts";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/store";
 import { getQuestionAnserIndex } from "../store/selectors/gameSelectors.ts";
-import { QuestionNext, QuestionPrevious } from "./functions/questionAnswer.ts";
-import { ResetBuzzerFunctions } from "./functions/buzzer.ts";
+import {
+  QuestionNext,
+  QuestionPrevious,
+  RevealAnswer,
+} from "./functions/questionAnswer.ts";
+import {
+  LockBuzzerFunctions,
+  ResetBuzzerFunctions,
+} from "./functions/buzzer.ts";
+import { TextReveal, TextTyping } from "@/serverEvents/functions/text.ts";
 
 export const useRegisterPageEvents = () => {
   const dispatch = useAppDispatch();
@@ -22,13 +32,19 @@ export const useRegisterPageEvents = () => {
         dispatch(setConnectedPlayers(roomData.players));
       }
     });
-    socket.on("resetBuzzer/out", () => {
+    TextReveal.out((reveal) => {
+      dispatch(setTextRevealed(reveal));
+    });
+    TextTyping.out((player, text) => {
+      dispatch(setText({ player, text }));
+    });
+    ResetBuzzerFunctions.out(() => {
       dispatch(resetBuzzer());
     });
-    socket.on("lockBuzzer/out", (locked) => {
+    LockBuzzerFunctions.out((locked) => {
       dispatch(setBuzzerLocked(locked));
     });
-    socket.on("revealAnswer/out", () => {
+    RevealAnswer.out(() => {
       dispatch(setAnswerRevealed(true));
     });
     QuestionNext.out(() => {

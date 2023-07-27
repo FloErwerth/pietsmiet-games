@@ -15,6 +15,7 @@ export type Player = {
   userName: string;
   points: number;
   isHost?: boolean;
+  typedText?: string;
 };
 export type Host = Omit<Player, "points">;
 
@@ -53,6 +54,8 @@ export type IncommingMessages = {
   ["question/previous/in"]: (roomNumber: string) => void;
   ["correctAnswer/in"]: (roomNumber: string, player: Player) => void;
   ["incorrectAnswer/in"]: (roomNumber: string, player: Player) => void;
+  ["text/in"]: (roomNumber: string, player: Player, text: string) => void;
+  ["textReveal/in"]: (roomNumber: string, reveal: boolean) => void;
 };
 
 export type OutgoingMessages = {
@@ -72,6 +75,8 @@ export type OutgoingMessages = {
   ["question/previous/out"]: () => void;
   ["correctAnswer/out"]: (players: Player[]) => void;
   ["incorrectAnswer/out"]: (players: Player[]) => void;
+  ["text/out"]: (player: Player, text: string) => void;
+  ["textReveal/out"]: (reveal: boolean) => void;
 };
 
 export const io = new Server(server, {
@@ -86,6 +91,14 @@ io.on("connection", (socket: Socket<IncommingMessages, OutgoingMessages>) => {
 
   socket.on("disconnect", () => {
     console.log("socket disconnected");
+  });
+
+  socket.on("text/in", (roomNumber, player, text) => {
+    io.to(roomNumber).emit("text/out", player, text);
+  });
+
+  socket.on("textReveal/in", (roomNumber, reveal) => {
+    io.to(roomNumber).emit("textReveal/out", reveal);
   });
 
   socket.on("correctAnswer/in", (roomNumber, player) => {

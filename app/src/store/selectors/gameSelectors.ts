@@ -70,3 +70,7 @@ export const getIsAnswerRevealed = createSelector(
   [getGameState],
   (state) => state.answerRevealed,
 );
+export const getTextRevealed = createSelector(
+  [getGameState],
+  (state) => state.textRevealed,
+);

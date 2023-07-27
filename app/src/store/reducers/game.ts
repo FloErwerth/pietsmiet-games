@@ -20,6 +20,10 @@ export const setQuestionAnswerIndex = createAction<number>(
 export const setAnswerRevealed = createAction<boolean>(
   "game/set_answer_revealed",
 );
+export const setText = createAction<{ player: Player; text: string }>(
+  "game/set_text",
+);
+export const setTextRevealed = createAction<boolean>("game/set_text_revealed");
 export type GameState = {
   gameStarted: boolean;
   buzzer: Omit<Player, "points"> | undefined;
@@ -31,6 +35,7 @@ export type GameState = {
   connectedPlayers: Player[];
   user: Player;
   questionAnserIndex: number;
+  textRevealed: boolean;
 };
 
 const initialGameState: GameState = {
@@ -44,13 +49,28 @@ const initialGameState: GameState = {
   isJoining: true,
   connectedPlayers: [],
   user: { userName: "", points: 0, socketId: "" },
+  textRevealed: false,
 };
 
 const gameReducer = createReducer<GameState>(initialGameState, (builder) => {
   builder
+    .addCase(setText, (state, action) => {
+      state.connectedPlayers = state.connectedPlayers.map((player) => {
+        if (player.socketId === action.payload.player.socketId) {
+          return { typedText: action.payload.text, ...action.payload.player };
+        } else {
+          return player;
+        }
+      });
+    })
     .addCase(setRoomID, (state, action) => {
       if (state) {
         state.roomId = action.payload;
+      }
+    })
+    .addCase(setTextRevealed, (state, action) => {
+      if (state) {
+        state.textRevealed = action.payload;
       }
     })
     .addCase(setAnswerRevealed, (state, action) => {

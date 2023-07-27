@@ -10,6 +10,7 @@ import {
   getIsHost,
   getQuestionAnserIndex,
   getRoomID,
+  getTextRevealed,
 } from "@/store/selectors/gameSelectors.ts";
 import { useRegisterPageEvents } from "../../serverEvents/playPageEvents.tsx";
 import {
@@ -17,14 +18,16 @@ import {
   ResetBuzzerFunctions,
 } from "@/serverEvents/functions/buzzer.ts";
 import {
-  AnswerFunctions,
   QuestionNext,
   QuestionPrevious,
+  RevealAnswer,
 } from "@/serverEvents/functions/questionAnswer.ts";
 import { PlayerCard } from "@/components/ui/PlayerCard/PlayerCard.tsx";
 import { QuestionTracker } from "@/components/ui/QuestionTracker/QuestionTracker.tsx";
 import { PlayPagePreroom } from "@/pages/PlayPagePreroom/PlayPagePreroom.tsx";
 import { Buzzer } from "@/components/ui/Buzzer/Buzzer.tsx";
+import { TextReveal } from "@/serverEvents/functions/text.ts";
+import { Button } from "@/components/ui/button.tsx";
 
 const ModeratorHandles = () => {
   const roomId = useAppSelector(getRoomID);
@@ -33,14 +36,19 @@ const ModeratorHandles = () => {
   const currentQuestionAnswerIndex = useAppSelector(getQuestionAnserIndex);
   const pairs = useAppSelector(getCurrentPairs);
   const buzzerLocked = useAppSelector(getIsBuzzerLocked);
+  const textRevealed = useAppSelector(getTextRevealed);
 
   const handleLockBuzzer = useCallback(() => {
     LockBuzzerFunctions.in(roomId, !buzzerLocked);
   }, [buzzerLocked, roomId]);
 
   const handleRevealAnswer = useCallback(() => {
-    AnswerFunctions.in(roomId);
+    RevealAnswer.in(roomId);
   }, [roomId]);
+
+  const handleRevealText = useCallback(() => {
+    TextReveal.in(roomId, !textRevealed);
+  }, [roomId, textRevealed]);
 
   const handleNextQuestion = useCallback(() => {
     QuestionNext.in(roomId);
@@ -55,20 +63,27 @@ const ModeratorHandles = () => {
   }, [roomId]);
 
   return (
-    <div>
+    <div className="grid auto-rows-max justify-self-center w-fit">
+      <div>Fragen</div>
       {pairs?.[currentQuestionAnswerIndex + 1] && (
-        <button onClick={handleNextQuestion}>Nächste Frage</button>
+        <Button onClick={handleNextQuestion}>Nächste Frage</Button>
       )}
       {currentQuestionAnswerIndex > 0 && (
-        <button onClick={handlePreviousQuestion}>Vorherige Frage</button>
+        <Button onClick={handlePreviousQuestion}>Vorherige Frage</Button>
       )}
-      <button onClick={handleLockBuzzer}>
+      <div>Buzzer</div>
+      <Button onClick={handleLockBuzzer}>
         {buzzerLocked ? "Buzzer entsperren" : "Buzzer sperren"}
-      </button>
-      <button onClick={handleRevealAnswer}>Antwort anzeigen</button>
+      </Button>
       {buzzer && (
-        <button onClick={handleBuzzerReset}>Buzzer zurücksetzen</button>
+        <Button onClick={handleBuzzerReset}>Buzzer zurücksetzen</Button>
       )}
+      <div>Antworten</div>
+      <Button onClick={handleRevealAnswer}>Antwort anzeigen</Button>
+      <div>Textfelder</div>
+      <Button onClick={handleRevealText}>
+        {textRevealed ? "Textfelder verstecken" : "Textfelder anzeigen"}
+      </Button>
     </div>
   );
 };
@@ -101,7 +116,7 @@ export const PlayPage = () => {
         )}
         <div className="grid grid-cols-5 grid-rows-1 gap-x-5 justify-evenly">
           <div className="w-fit justify-self-center col-start-3 col-end-3 row-start-1 row-end-1">
-            <Buzzer />
+            {!isModerator && <Buzzer />}
           </div>
           {connectedPlayers.map((player) => (
             <PlayerCard player={player} />
