@@ -25,7 +25,7 @@ export const CardWithPicture = ({
   return (
     <Card className={combinedCardClasses} onClick={onClickCard}>
       <CardHeader className="w-fit p-0">
-        <img className="rounded-t" alt="Picture" src={image} />
+        <img className="rounded-t" alt="Picture" loading={"lazy"} src={image} />
       </CardHeader>
       <CardContent className="flex items-center p-0 h-10">
         {children}
