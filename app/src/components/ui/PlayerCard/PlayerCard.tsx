@@ -109,7 +109,10 @@ export const PlayerCard = ({ player }: { player: Player }) => {
           />
           {isMe && (
             <Check
-              className="bg-primary absolute right-2 cursor-pointer top-2 rounded stroke-white"
+              className={cn(
+                "bg-primary transition-opacity absolute opacity-0 pointer-events-none right-2 cursor-pointer top-2 rounded stroke-white",
+                typedText && "opacity-100 pointer-events-auto",
+              )}
               onClick={handleTextConfirm}
             />
           )}
