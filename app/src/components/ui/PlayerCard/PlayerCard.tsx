@@ -1,6 +1,7 @@
 import { usePlayerCardEvents } from "@/serverEvents/playerCardEvents.tsx";
 import { useAppSelector } from "@/store";
 import {
+  getAvatar,
   getBuzzer,
   getIsHost,
   getRoomID,
@@ -18,6 +19,11 @@ import { cn } from "@/lib/utils.ts";
 import { TextTyping } from "@/serverEvents/functions/text.ts";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button.tsx";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar.tsx";
 
 export const PlayerCard = ({ player }: { player: Player }) => {
   usePlayerCardEvents();
@@ -27,6 +33,7 @@ export const PlayerCard = ({ player }: { player: Player }) => {
   const user = useAppSelector(getUser);
   const [typedText, setTypedText] = useState("");
   const textRevealed = useAppSelector(getTextRevealed);
+  const avatar = useAppSelector(getAvatar);
 
   useEffect(() => {
     if ((!isMe && textRevealed) || isHost) {
@@ -85,7 +92,10 @@ export const PlayerCard = ({ player }: { player: Player }) => {
           ></div>
         )}
         <div className="flex gap-x-3">
-          <div className="rounded-full w-[50px] h-[50px] bg-black"></div>
+          <Avatar>
+            <AvatarImage src={isMe ? avatar : player.avatarURL}></AvatarImage>
+            <AvatarFallback />
+          </Avatar>
           <div className="flex flex-col items-start justify-start">
             <div className="text-xl">{player.userName}</div>
             <div className="flex items-center gap-x-2">

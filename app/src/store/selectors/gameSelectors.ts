@@ -39,6 +39,10 @@ export const getUser = createSelector([getGameState], (state) => {
   return state.user;
 });
 
+export const getAvatar = createSelector([getUser], (user) => {
+  return user.avatarURL;
+});
+
 export const getIsHost = createSelector([getUser], (user) => user.isHost);
 export const getHostName = createSelector(
   [getUser, getIsHost],

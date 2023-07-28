@@ -16,8 +16,8 @@ export type Player = {
   points: number;
   isHost?: boolean;
   typedText?: string;
+  avatarURL?: string;
 };
-export type Host = Omit<Player, "points">;
 
 export type RoomData = {
   [key: string]: {
@@ -33,6 +33,11 @@ const roomData: RoomData = {};
 
 export type IncommingMessages = {
   connection: "connection";
+  ["sendProfilePicture/in"]: (
+    roomNumber: string,
+    pictureBlob: ArrayBuffer,
+    senderId: string,
+  ) => void;
   ["createRoom/in"]: (
     roomNumber: string,
     chosenGeneralTopic: GeneralTopicName,
@@ -60,6 +65,10 @@ export type IncommingMessages = {
 
 export type OutgoingMessages = {
   connection: "connection";
+  ["sendProfilePicture/out"]: (
+    pictureBlob: ArrayBuffer,
+    senderId: string,
+  ) => void;
   ["createRoom/out"]: (roomId: string) => void;
   ["leaveRoom/out"]: (roomId: string, userName: string) => void;
   ["joinRoom/out"]: (roomData: RoomData[string]) => void;
@@ -91,6 +100,10 @@ io.on("connection", (socket: Socket<IncommingMessages, OutgoingMessages>) => {
 
   socket.on("disconnect", () => {
     console.log("socket disconnected");
+  });
+
+  socket.on("sendProfilePicture/in", (roomNumber, pictureBlob, senderId) => {
+    io.to(roomNumber).emit("sendProfilePicture/out", pictureBlob, senderId);
   });
 
   socket.on("text/in", (roomNumber, player, text) => {

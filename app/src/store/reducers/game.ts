@@ -14,6 +14,10 @@ export const setActiveBuzzer = createAction<Omit<Player, "points"> | undefined>(
 export const resetBuzzer = createAction<undefined>("game/buzzer_reset");
 export const setBuzzerLocked = createAction<boolean>("game/buzzer_lock");
 export const setStartGame = createAction<boolean>("game/set_start_game");
+export const setProfilePicture = createAction<{
+  picture: string;
+  senderId: string;
+}>("game/set_profile_picture");
 export const setQuestionAnswerIndex = createAction<number>(
   "game/set_question_anser_index",
 );
@@ -68,6 +72,22 @@ const gameReducer = createReducer<GameState>(initialGameState, (builder) => {
         state.roomId = action.payload;
       }
     })
+    .addCase(setProfilePicture, (state, action) => {
+      if (state && state.connectedPlayers) {
+        const foundPlayerIndex = state.connectedPlayers.findIndex((player) => {
+          return player.socketId === action.payload.senderId;
+        });
+        if (foundPlayerIndex >= 0) {
+          const playerWithPic: Player = {
+            ...state.connectedPlayers[foundPlayerIndex],
+            avatarURL: action.payload.picture,
+          };
+          const newPlayers = [...state.connectedPlayers];
+          newPlayers.splice(foundPlayerIndex, 1, playerWithPic);
+          state.connectedPlayers = newPlayers;
+        }
+      }
+    })
     .addCase(setTextRevealed, (state, action) => {
       if (state) {
         state.textRevealed = action.payload;
@@ -88,7 +108,7 @@ const gameReducer = createReducer<GameState>(initialGameState, (builder) => {
     })
     .addCase(setUser, (state, action) => {
       if (state) {
-        const isHost = state.user.isHost ?? action.payload.isHost ?? false;
+        const isHost = state.user.isHost ?? action.payload.isHost ?? undefined;
         state.user = { isHost, ...state.user, ...action.payload };
       }
     })

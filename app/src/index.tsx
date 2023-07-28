@@ -8,6 +8,8 @@ import { io, Socket } from "socket.io-client";
 import { IncommingMessages, OutgoingMessages } from "../../backend";
 import { App } from "@/App.tsx";
 import { TooltipProvider } from "@/components/ui/tooltip.tsx";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement,

@@ -12,6 +12,7 @@ import { useEffectOnce } from "react-use";
 import { Input } from "@/components/ui/input.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { HowTo } from "@/pages/MainPage/Components/HowTo/HowTo.tsx";
+import { AvatarWithUpload } from "@/components/ui/Avatar/AvatarWithUpload.tsx";
 
 export const MainPage = () => {
   const [name, setName] = useState("");
@@ -43,23 +44,26 @@ export const MainPage = () => {
   }, [dispatch, name, navigate]);
 
   return (
-    <div className="grid auto-rows-fr justify-center items-center gap-5">
-      <h1 className="font-bold text-7xl text-center pb-5">50 Fragen Online</h1>
+    <div className="grid auto-rows-fr justify-center items-center">
+      <h1 className="font-bold text-7xl text-center pb-2">50 Fragen Online</h1>
       <div className="border-2 m-auto p-5 rounded-xl">
-        <div className="grid grid-rows-2 gap-5">
-          <div className="mb-5">
+        <div className="grid grid-rows-2 gap-2 max-w-[400px]">
+          <div className="mb-2">
             Um eine Spieleraum erstellen zu können brauchen wir einen Spitznamen
-            von Dir
+            von Dir. Optional auch einen Avatar.
           </div>
-          <div className="flex w-full m-auto max-w-sm items-center space-x-2">
-            <Input
-              onChange={(e) => handleSetName(e.target.value)}
-              type="email"
-              placeholder="Dein Spitzname"
-            />
-            <Button onClick={handleConfirmName} type="submit">
-              bestätigen
-            </Button>
+          <div className="flex w-full m-auto max-w-sm items-center space-x-5">
+            <AvatarWithUpload />
+            <div className="flex flex-col gap-3">
+              <Input
+                onChange={(e) => handleSetName(e.target.value)}
+                type="email"
+                placeholder="Dein Spitzname"
+              />
+              <Button onClick={handleConfirmName} type="submit">
+                bestätigen
+              </Button>
+            </div>
           </div>
         </div>
       </div>

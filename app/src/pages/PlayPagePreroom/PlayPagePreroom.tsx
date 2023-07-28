@@ -1,5 +1,6 @@
 import { useAppDispatch, useAppSelector } from "@/store";
 import {
+  getAvatar,
   getConnectedPlayers,
   getGameStarted,
   getIsHost,
@@ -19,6 +20,7 @@ import {
 import {
   setConnected,
   setConnectedPlayers,
+  setProfilePicture,
   setRoomID,
   setStartGame,
   setUser,
@@ -51,6 +53,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip.tsx";
+import Compressor from "compressorjs";
 
 const HostContent = () => {
   const connectedPlayers = useAppSelector(getConnectedPlayers);
@@ -144,6 +147,7 @@ export const PlayPagePreroom = ({ shown, setShown }: PlayPagePreroomProps) => {
   const { id } = useParams();
   const isHost = useAppSelector(getIsHost);
   const gameStarted = useAppSelector(getGameStarted);
+  const avatar = useAppSelector(getAvatar);
   useRegisterPagePreroomEvents();
 
   useEffect(() => {
@@ -160,14 +164,10 @@ export const PlayPagePreroom = ({ shown, setShown }: PlayPagePreroomProps) => {
         navigate("/");
       }
     }
-    JoinRoomFunctions.out((roomData) => {
-      if (roomData.players) {
-        dispatch(setConnectedPlayers(roomData.players));
-        dispatch(setChosenPackName(roomData.packname));
-        dispatch(setUser({ socketId: socket.id }));
-        dispatch(setChosenGeneralTopic(roomData.generalTopic));
-        dispatch(setConnected(true));
-      }
+    socket.on("sendProfilePicture/out", (pictureBlob, senderId) => {
+      const blob = new Blob([pictureBlob]);
+      const url = URL.createObjectURL(blob);
+      dispatch(setProfilePicture({ picture: url, senderId }));
     });
     StartGameFunctions.out(() => {
       dispatch(setStartGame(true));
@@ -177,6 +177,40 @@ export const PlayPagePreroom = ({ shown, setShown }: PlayPagePreroomProps) => {
       navigate("/");
     });
   }, []);
+
+  useEffect(() => {
+    JoinRoomFunctions.out((roomData) => {
+      if (roomData.players) {
+        dispatch(setConnectedPlayers(roomData.players));
+        dispatch(setChosenPackName(roomData.packname));
+        dispatch(setUser({ socketId: socket.id }));
+        dispatch(setChosenGeneralTopic(roomData.generalTopic));
+        dispatch(setConnected(true));
+        if (avatar) {
+          fetch(avatar).then((response) => {
+            response.blob().then((blob) => {
+              const file = new File([blob], "", { type: "image/jpeg" });
+              new Compressor(file, {
+                maxWidth: 100,
+                maxHeight: 100,
+                quality: 100,
+                success(compressedBlob) {
+                  compressedBlob.arrayBuffer().then((buffer) => {
+                    socket.emit(
+                      "sendProfilePicture/in",
+                      roomId,
+                      buffer,
+                      socket.id,
+                    );
+                  });
+                },
+              });
+            });
+          });
+        }
+      }
+    });
+  }, [avatar]);
 
   useEffect(() => {
     if (gameStarted) {
