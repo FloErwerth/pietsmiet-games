@@ -1,5 +1,0 @@
-node_modules
-*.key
-*.crt
-/backend/keys
-/.idea
