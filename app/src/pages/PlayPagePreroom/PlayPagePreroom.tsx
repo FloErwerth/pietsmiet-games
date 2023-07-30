@@ -220,7 +220,7 @@ export const PlayPagePreroom = ({ shown, setShown }: PlayPagePreroomProps) => {
 
   return (
     <AlertDialog onOpenChange={setShown} open={shown}>
-      <AlertDialogContent>
+      <AlertDialogContent className="w-[calc(100vw-20px)]">
         <>
           {isHost !== undefined ? (
             <>{isHost ? <HostContent /> : <PlayerContent />}</>

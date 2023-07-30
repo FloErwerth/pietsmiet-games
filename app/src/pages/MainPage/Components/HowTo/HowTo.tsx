@@ -20,7 +20,11 @@ export const HowTo = () => {
   const [open, setOpen] = useState(false);
 
   return (
-    <Collapsible className="wrapper" open={open} onOpenChange={setOpen}>
+    <Collapsible
+      className="h-[200px] max-w-[400px] data-[state=closed]:w-[calc(100%-10px)] data-[state=open]:w-[calc(100%-10px)] md:data-[state=closed]:w-[400px] md:w-full"
+      open={open}
+      onOpenChange={setOpen}
+    >
       <div className="flex items-center justify-between space-x-4 px-4">
         <h4 className="text-sm font-semibold">Wie erstelle ich einen Raum?</h4>
         <CollapsibleTrigger asChild>

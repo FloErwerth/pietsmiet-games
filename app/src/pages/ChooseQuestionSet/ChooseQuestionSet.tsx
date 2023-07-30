@@ -52,13 +52,13 @@ export const ChooseQuestionSet = () => {
   }, []);
 
   return (
-    <div className="grid auto-rows-auto gap-y-10">
+    <div className="flex flex-col md:grid md:auto-rows-auto gap-y-5 mt-5">
       {chosenTopic && (
-        <div className="text-2xl">
+        <div className="text-xl">
           Wähle ein Frageset zur Kategorie {chosenTopic}
         </div>
       )}
-      <div className="w-1/4 mb-5">
+      <div className="w-full md:w-1/4">
         <Input
           placeholder="Filtern"
           value={filter}
@@ -67,7 +67,7 @@ export const ChooseQuestionSet = () => {
       </div>
       {infos && (
         <ScrollArea className="h-[600px] w-full rounded-md pr-4">
-          <div className="grid grid-cols-3 gap-5">
+          <div className="flex flex-col md:grid md:auto-rows-auto gap-y-5">
             {extractedInfos.map(({ packName, videoId }) => {
               const isFiltered = !filtered.includes(packName);
               return (

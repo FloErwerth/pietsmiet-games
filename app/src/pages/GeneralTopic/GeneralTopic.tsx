@@ -11,12 +11,12 @@ import { ScrollArea } from "@/components/ui/scroll-area.tsx";
 
 export const GeneralTopic = () => {
   const topics = useAppSelector(getTopics);
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const mappedTopics = useMemo(
     () => Object.entries(topics) as [GeneralTopicName, GeneralTopicInfo][],
     [topics],
   );
-  const navigate = useNavigate();
-  const dispatch = useAppDispatch();
   const [filter, setFilter, filtered] = useFilter(mappedTopics);
 
   const handleGeneralTopicSelection = useCallback(
@@ -27,12 +27,27 @@ export const GeneralTopic = () => {
     [dispatch, navigate],
   );
 
+  const sortedMappedTopics = useMemo(
+    () =>
+      mappedTopics.sort(([generalTopicName], [generalTopicName2]) => {
+        const isFiltered = !Object.values(filtered).find((name) => {
+          return Object.values(name).includes(generalTopicName);
+        });
+        if (filter) {
+          return isFiltered ? 1 : -1;
+        } else {
+          return generalTopicName.localeCompare(generalTopicName2);
+        }
+      }),
+    [filter, filtered, mappedTopics],
+  );
+
   return (
-    <div className="grid auto-rows-auto items-center gap-y-5">
-      <div className="text-2xl">
+    <div className="grid auto-rows-auto items-center gap-y-5 mt-5">
+      <div className="text-xl">
         Wähle nun ein Thema, über das Du Fragen beantworten möchtest
       </div>
-      <div className="w-1/4 mb-5">
+      <div className="w-full md:w-1/4">
         <Input
           placeholder="Filtern"
           value={filter}
@@ -40,18 +55,14 @@ export const GeneralTopic = () => {
         />
       </div>
       <ScrollArea className="h-[600px] w-full rounded-md pr-4">
-        <div className="grid grid-cols-3 gap-5">
-          {mappedTopics.map(([generalTopicName, infos]) => {
-            const isFiltered = !Object.values(filtered).find((name) => {
-              return Object.values(name).includes(generalTopicName);
-            });
+        <div className="flex flex-col md:grid md:auto-rows-auto gap-y-5">
+          {sortedMappedTopics.map(([generalTopicName, infos]) => {
             return (
               <CardWithPicture
                 image={infos.titlePicture}
                 onClickCard={() =>
                   handleGeneralTopicSelection(generalTopicName)
                 }
-                cardClasses={isFiltered ? "opacity-50 saturate-50" : ""}
               >
                 <p className="text-center w-full transition-opacity">
                   {generalTopicName}

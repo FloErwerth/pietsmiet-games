@@ -16,7 +16,7 @@ const root = ReactDOM.createRoot(
 );
 
 export const socket: Socket<OutgoingMessages, IncommingMessages> = io(
-  `http://localhost:5121`,
+  `https://quizgame.fun:5121`,
   { autoConnect: true, forceNew: false },
 );
 

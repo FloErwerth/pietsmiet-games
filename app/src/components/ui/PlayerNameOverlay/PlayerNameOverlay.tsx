@@ -3,8 +3,10 @@ import { JoinRoomFunctions } from "@/serverEvents/functions/joinRoom.ts";
 import { useAppDispatch, useAppSelector } from "@/store";
 import { getRoomID } from "@/store/selectors/gameSelectors.ts";
 import { Input } from "@/components/ui/input.tsx";
-import { AlertDialogCancel } from "@/components/ui/alert-dialog.tsx";
-import { Button } from "@/components/ui/button.tsx";
+import {
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog.tsx";
 import { setUser } from "@/store/reducers/game.ts";
 import { AvatarWithUpload } from "@/components/ui/Avatar/AvatarWithUpload.tsx";
 
@@ -24,23 +26,21 @@ export const PlayerNameOverlay = () => {
   }, [userName, roomId, dispatch]);
 
   return (
-    <>
-      <div>
-        Damit deine Mitspieler wissen wer Du bist, musst Du noch einen
-        Spitznamen eingeben und optional auch einen Avatar für dich hochladen
-      </div>
-      <div className="flex gap-x-5">
+    <div className="w-full flex flex-col gap-y-5">
+      <div>Gib deinen Spitznamen ein und lade einen Avatar hoch</div>
+      <div className="flex md:flex-row items-center flex-col md:gap-x-5 gap-y-5">
         <AvatarWithUpload />
         <Input
           placeholder="Dein Spitzname"
           onChange={(e) => handleNameChange(e.target.value)}
         />
       </div>
-
-      <div className="grid grid-cols-2 gap-x-5">
-        <Button onClick={handleNameConfirm}>Spitznamen bestätigen</Button>
-        <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+      <div className="grid grid-cols-2 items-center justify-center gap-x-5">
+        <AlertDialogAction onClick={handleNameConfirm}>
+          Bestätigen
+        </AlertDialogAction>
+        <AlertDialogCancel className="m-0">Abbrechen</AlertDialogCancel>
       </div>
-    </>
+    </div>
   );
 };

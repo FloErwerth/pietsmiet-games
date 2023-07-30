@@ -1,14 +1,54 @@
-import type { Server as ServerType, Socket } from "socket.io";
-import { GeneralTopicName } from "../app/src/data/";
+import type {Server as ServerType, Socket} from "socket.io";
+
+type QuestionPack = {
+  [name: string]: {
+    videoId: string;
+    pairs: Array<{ question: string; answer: string }>;
+  };
+};
+
+const GeneralTopics = [
+  "Game of Thrones",
+  "Tierwelt",
+  "Deutsches Recht",
+  "Physik",
+  "Biologie",
+  "Chemie",
+  "Allgemeinwissen",
+  "Erfindungen",
+  "Unbeantwortete Fragen",
+  "Weltgeschichte",
+] as const;
+type GeneralTopicInfo = {
+  numberOfQuestionSets: number;
+  titlePicture: string;
+  packs: QuestionPack;
+};
+type GeneralTopicName = keyof {
+  [generalTopic in (typeof GeneralTopics)[number]]: GeneralTopicInfo;
+};
 
 const express = require("express");
 const { Server } = require("socket.io");
+const https = require("https");
+const fs = require("fs");
+
+const options = {
+  key: fs.readFileSync("./keys/quizgame.key"),
+  cert: fs.readFileSync("./keys/quizgame.crt"),
+  ca: fs.readFileSync("./keys/quizgame.ca.crt"),
+  requestCert: false,
+  rejectUnauthorized: false,
+};
+
 export const SERVER_PORT = 5121;
 
 const app = express();
-const server = app.listen(SERVER_PORT, () => {
+const server = https.createServer(options, app);
+server.listen(SERVER_PORT, () => {
   console.log(`Server is listening on port ${SERVER_PORT}`);
 });
+
 
 export type Player = {
   socketId: string;
