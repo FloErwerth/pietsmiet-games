@@ -72,7 +72,7 @@ export const getCurrentQuestion = createSelector(
 );
 export const getIsAnswerRevealed = createSelector(
   [getGameState],
-  (state) => state.answerRevealed,
+  (state) => state.answerRevealed ?? false,
 );
 export const getTextRevealed = createSelector(
   [getGameState],

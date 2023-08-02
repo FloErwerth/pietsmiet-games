@@ -44,8 +44,8 @@ export const useRegisterPageEvents = () => {
     LockBuzzerFunctions.out((locked) => {
       dispatch(setBuzzerLocked(locked));
     });
-    RevealAnswer.out(() => {
-      dispatch(setAnswerRevealed(true));
+    RevealAnswer.out((revealed) => {
+      dispatch(setAnswerRevealed(revealed));
     });
     QuestionNext.out(() => {
       dispatch(setAnswerRevealed(false));

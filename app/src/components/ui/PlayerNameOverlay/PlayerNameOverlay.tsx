@@ -3,12 +3,10 @@ import { JoinRoomFunctions } from "@/serverEvents/functions/joinRoom.ts";
 import { useAppDispatch, useAppSelector } from "@/store";
 import { getRoomID } from "@/store/selectors/gameSelectors.ts";
 import { Input } from "@/components/ui/input.tsx";
-import {
-  AlertDialogAction,
-  AlertDialogCancel,
-} from "@/components/ui/alert-dialog.tsx";
+import { AlertDialogCancel } from "@/components/ui/alert-dialog.tsx";
 import { setUser } from "@/store/reducers/game.ts";
 import { AvatarWithUpload } from "@/components/ui/Avatar/AvatarWithUpload.tsx";
+import { Button } from "@/components/ui/button.tsx";
 
 export const PlayerNameOverlay = () => {
   const [userName, setUserName] = useState("");
@@ -31,14 +29,13 @@ export const PlayerNameOverlay = () => {
       <div className="flex md:flex-row items-center flex-col md:gap-x-5 gap-y-5">
         <AvatarWithUpload />
         <Input
+          maxLength={10}
           placeholder="Dein Spitzname"
           onChange={(e) => handleNameChange(e.target.value)}
         />
       </div>
       <div className="grid grid-cols-2 items-center justify-center gap-x-5">
-        <AlertDialogAction onClick={handleNameConfirm}>
-          Bestätigen
-        </AlertDialogAction>
+        <Button onClick={handleNameConfirm}>Bestätigen</Button>
         <AlertDialogCancel className="m-0">Abbrechen</AlertDialogCancel>
       </div>
     </div>

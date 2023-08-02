@@ -1,4 +1,4 @@
-import type {Server as ServerType, Socket} from "socket.io";
+import type { Server as ServerType, Socket } from "socket.io";
 
 type QuestionPack = {
   [name: string]: {
@@ -49,7 +49,6 @@ server.listen(SERVER_PORT, () => {
   console.log(`Server is listening on port ${SERVER_PORT}`);
 });
 
-
 export type Player = {
   socketId: string;
   userName: string;
@@ -94,7 +93,7 @@ export type IncommingMessages = {
   ["lockBuzzer/in"]: (roomNumber: string, locked: boolean) => void;
   ["resetBuzzer/in"]: (roomNumber: string) => void;
   ["startGame/in"]: (roomNumber: string) => void;
-  ["revealAnswer/in"]: (roomNumber: string) => void;
+  ["revealAnswer/in"]: (roomNumber: string, revealed: boolean) => void;
   ["question/next/in"]: (roomNumber: string) => void;
   ["question/previous/in"]: (roomNumber: string) => void;
   ["correctAnswer/in"]: (roomNumber: string, player: Player) => void;
@@ -119,7 +118,7 @@ export type OutgoingMessages = {
   ["lockBuzzer/out"]: (locked: boolean) => void;
   ["resetBuzzer/out"]: () => void;
   ["startGame/out"]: () => void;
-  ["revealAnswer/out"]: () => void;
+  ["revealAnswer/out"]: (revealed: boolean) => void;
   ["question/next/out"]: () => void;
   ["question/previous/out"]: () => void;
   ["correctAnswer/out"]: (players: Player[]) => void;
@@ -188,8 +187,9 @@ io.on("connection", (socket: Socket<IncommingMessages, OutgoingMessages>) => {
     io.to(roomNumber).emit("question/previous/out");
   });
 
-  socket.on("revealAnswer/in", (roomNumber) => {
-    io.in(roomNumber).emit("revealAnswer/out");
+  socket.on("revealAnswer/in", (roomNumber, revealed) => {
+    console.log(revealed);
+    io.in(roomNumber).emit("revealAnswer/out", revealed);
   });
 
   socket.on("buzzer/in", (roomNumber, player) => {

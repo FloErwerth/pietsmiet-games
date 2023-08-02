@@ -57,6 +57,7 @@ export const MainPage = () => {
           <AvatarWithUpload />
           <div className="flex flex-col gap-3 w-full">
             <Input
+              maxLength={10}
               onChange={(e) => handleSetName(e.target.value)}
               type="email"
               placeholder="Dein Spitzname"

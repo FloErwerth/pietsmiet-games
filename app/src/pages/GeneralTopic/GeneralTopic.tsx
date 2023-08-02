@@ -55,7 +55,7 @@ export const GeneralTopic = () => {
         />
       </div>
       <ScrollArea className="h-[600px] w-full rounded-md pr-4">
-        <div className="flex flex-col md:grid md:auto-rows-auto gap-y-5">
+        <div className="flex flex-col md:grid lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5">
           {sortedMappedTopics.map(([generalTopicName, infos]) => {
             return (
               <CardWithPicture

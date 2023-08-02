@@ -9,9 +9,9 @@ const incorrectAnswerIn = (roomId: string, player: Player) =>
   socket.emit("incorrectAnswer/in", roomId, player);
 const incorrectAnswerOut = (listener: (player: Player[]) => void) =>
   socket.on("incorrectAnswer/out", listener);
-const revealAnswerIn = (roomId: string) =>
-  socket.emit("revealAnswer/in", roomId);
-const revealAnswerOut = (listener: () => void) =>
+const revealAnswerIn = (roomId: string, revealed: boolean) =>
+  socket.emit("revealAnswer/in", roomId, revealed);
+const revealAnswerOut = (listener: (revealed: boolean) => void) =>
   socket.on("revealAnswer/out", listener);
 const questionNextIn = (roomId: string) =>
   socket.emit("question/next/in", roomId);
