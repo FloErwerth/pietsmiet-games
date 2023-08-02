@@ -9,13 +9,7 @@ import {
   getUser,
 } from "@/store/selectors/gameSelectors.ts";
 import { Player } from "../../../../../backend";
-import React, {
-  ChangeEvent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
 import {
   CorrectAnswer,
   IncorrectAnswer,
