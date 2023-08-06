@@ -2,6 +2,7 @@ import { createSelector } from "@reduxjs/toolkit";
 import { getState } from "./baseSelectors";
 import { topics } from "@/data";
 import { getChosenGeneralTopic, getChosenPackName } from "./topicSelectors.ts";
+import { Player } from "../../../../backend";
 
 const getGameState = createSelector([getState], (state) => state.gameModel);
 export const getRoomID = createSelector(
@@ -52,6 +53,12 @@ export const getHostName = createSelector(
     }
   },
 );
+export const getIsMe = (player: Player) =>
+  createSelector([getUser], (user) => {
+    return (
+      player.socketId === user.socketId && player.userName === user.userName
+    );
+  });
 
 export const getQuestionAnserIndex = createSelector(
   [getGameState],
